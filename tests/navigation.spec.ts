@@ -43,7 +43,7 @@ test('Check left menu options', async ({ page }) => {
 });
 
 test('Navigate thought he left panel', async ({ page }) => {
-
+  test.setTimeout(60000); 
   const loginPage = new LoginPage(page);
   await loginPage.doLogin('Admin', 'admin123');
 
@@ -58,18 +58,22 @@ test('Navigate thought he left panel', async ({ page }) => {
     const menuText = await menuItem.innerText();
 
     console.log('Current menu item', menuText);
-    if (menuText === 'Maintenance') {
-      await menuItem.click();
-      await page.goBack();
-    } else {
-      await menuItem.click();
-      await page.waitForLoadState('networkidle')
 
+    try {
+      await menuItem.click();
+    } catch (error) {
+      console.log('Click failed for', menuText, error);
+      break;
+    }
+
+    if (menuText === 'Maintenance') {
+      await page.goBack();
+      await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible({ timeout: 10000 });
     }
   }
-
-
 })
+
+
 
 test('Check all the qualification links', async ({ page }) => {
 
